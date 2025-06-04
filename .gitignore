@@ -1,0 +1,6 @@
+.vscode
+artifacts/
+bin/
+dist/
+npt
+*.out
