@@ -2,9 +2,7 @@ PROJECT = npt
 VERSION = $(shell cat VERSION)
 LDFLAGS=-ldflags "-w -s -X github.com/hsn723/$(PROJECT)/cmd.version=${VERSION}"
 
-WORKDIR = /tmp/$(PROJECT)/work
-BINDIR = /tmp/$(PROJECT)/bin
-YQ = $(BINDIR)/yq
+BINDIR = $(shell pwd)/bin
 
 PATH := $(PATH):$(BINDIR)
 
@@ -14,7 +12,7 @@ all: build
 
 .PHONY: clean
 clean:
-	@if [ -f $(PROJECT) ]; then rm $(PROJECT); fi
+	@rm -rf $(BINDIR)
 
 .PHONY: lint
 lint:
@@ -26,21 +24,14 @@ lint:
 test:
 	go test --tags=test -coverprofile cover.out -count=1 -race -p 4 -v ./...
 
-.PHONY: $(YQ)
-$(YQ): $(BINDIR)
-	GOBIN=$(BINDIR) go install github.com/mikefarah/yq/v4@latest
-
 .PHONY: verify
 verify:
 	go mod download
 	go mod verify
 
 .PHONY: build
-build: clean
-	env CGO_ENABLED=0 go build $(LDFLAGS) .
+build: clean $(BINDIR)
+	CGO_ENABLED=0 go build $(LDFLAGS) -o $(BINDIR)/$(PROJECT) ./cmd/$(PROJECT)/
 
 $(BINDIR):
-	mkdir -p $(BINDIR)
-
-$(WORKDIR):
-	mkdir -p $(WORKDIR)
+	@mkdir -p $(BINDIR)
