@@ -1,0 +1,25 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: "backend-policy"
+  namespace: "backend"
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: backend
+  ingress:
+  - fromEndpoints:
+    - matchExpressions:
+        - key: app.kubernetes.io/name
+          operator: In
+          values:
+            - frontend
+            - api-gateway
+        - key: k8s:io.kubernetes.pod.namespace
+          operator: In
+          values:
+            - frontend
+    toPorts:
+    - ports:
+      - port: "443"
+        protocol: TCP

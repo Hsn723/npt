@@ -7,12 +7,15 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
+	"sync"
 
 	"github.com/cilium/cilium/api/v1/models"
 	"github.com/cilium/cilium/pkg/labels"
 	"github.com/cilium/cilium/pkg/policy"
 	"github.com/cilium/cilium/pkg/policy/api"
+	"golang.org/x/sync/errgroup"
 )
 
 type Scenario struct {
@@ -96,44 +99,67 @@ func LoadScenarios(scenarioDirs, scenarioFiles []string) ([]Scenario, error) {
 	for _, dir := range scenarioDirs {
 		_ = filepath.WalkDir(dir, loader)
 	}
-	for _, file := range scenarioFiles {
-		b, err := os.ReadFile(file)
-		if err != nil {
-			return nil, err
-		}
-		if strings.HasPrefix(strings.TrimSpace(string(b)), "[") {
-			var scenarios []Scenario
-			if err := json.Unmarshal(b, &scenarios); err != nil {
-				return nil, err
+	contents := make([][]Scenario, len(scenarioFiles))
+	errGroup := &errgroup.Group{}
+	for i, file := range scenarioFiles {
+		file := file
+		errGroup.Go(func() error {
+			b, err := os.ReadFile(file)
+			if err != nil {
+				return err
 			}
-			allScenarios = append(allScenarios, scenarios...)
-		} else {
-			var scenario Scenario
-			if err := json.Unmarshal(b, &scenario); err != nil {
-				return nil, err
+			if strings.HasPrefix(strings.TrimSpace(string(b)), "[") {
+				var scenarios []Scenario
+				if err := json.Unmarshal(b, &scenarios); err != nil {
+					return err
+				}
+				contents[i] = scenarios
+			} else {
+				var scenario Scenario
+				if err := json.Unmarshal(b, &scenario); err != nil {
+					return err
+				}
+				contents[i] = []Scenario{scenario}
 			}
-			allScenarios = append(allScenarios, scenario)
-		}
+			return nil
+		})
+	}
+	if err := errGroup.Wait(); err != nil {
+		return nil, err
+	}
+	for _, scenarios := range contents {
+		allScenarios = append(allScenarios, scenarios...)
 	}
 	return allScenarios, nil
 }
 
 func RunScenarios(repo *policy.Repository, scenarios []Scenario, isVerbose bool) []ScenarioResult {
 	results := make([]ScenarioResult, 0, len(scenarios))
+	resultsChannel := make(chan ScenarioResult, len(scenarios))
+	wg := sync.WaitGroup{}
+	wg.Add(len(scenarios))
 	for _, scenario := range scenarios {
-		searchContext := scenario.ToSearchContext(isVerbose)
-		var decision api.Decision
-		switch scenario.Direction {
-		case DirectionIngress:
-			decision = repo.AllowsIngressRLocked(searchContext)
-		case DirectionEgress:
-			decision = repo.AllowsEgressRLocked(searchContext)
-		}
-		result := ScenarioResult{
-			Name:     scenario.Name,
-			Expected: scenario.ExpectedVerdict,
-			Actual:   ParseDecision(decision),
-		}
+		go func(scenario Scenario) {
+			searchContext := scenario.ToSearchContext(isVerbose)
+			var decision api.Decision
+			switch scenario.Direction {
+			case DirectionIngress:
+				decision = repo.AllowsIngressRLocked(searchContext)
+			case DirectionEgress:
+				decision = repo.AllowsEgressRLocked(searchContext)
+			}
+			result := ScenarioResult{
+				Name:     scenario.Name,
+				Expected: scenario.ExpectedVerdict,
+				Actual:   ParseDecision(decision),
+			}
+			resultsChannel <- result
+			wg.Done()
+		}(scenario)
+	}
+	wg.Wait()
+	close(resultsChannel)
+	for result := range resultsChannel {
 		results = append(results, result)
 	}
 
@@ -141,6 +167,9 @@ func RunScenarios(repo *policy.Repository, scenarios []Scenario, isVerbose bool)
 }
 
 func OutputResults(results []ScenarioResult, w io.Writer, isJSON bool) error {
+	slices.SortFunc(results, func(a, b ScenarioResult) int {
+		return strings.Compare(a.Name, b.Name)
+	})
 	if isJSON {
 		encoder := json.NewEncoder(w)
 		encoder.SetIndent("", "  ")

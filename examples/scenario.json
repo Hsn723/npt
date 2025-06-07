@@ -1,0 +1,101 @@
+[
+    {
+        "name": "Allow ingress from frontend",
+        "from": [
+            {
+                "key": "app.kubernetes.io/name",
+                "value": "frontend"
+            },
+            {
+                "key": "io.kubernetes.pod.namespace",
+                "value": "frontend",
+                "source": "k8s"
+            }
+        ],
+        "to": [
+            {
+                "key": "app.kubernetes.io/name",
+                "value": "backend"
+            },
+            {
+                "key": "io.kubernetes.pod.namespace",
+                "value": "backend",
+                "source": "k8s"
+            }
+        ],
+        "dPorts": [
+            {
+                "port": 443,
+                "protocol": "TCP"
+            }
+        ],
+        "direction": "ingress",
+        "expectedVerdict": "Allowed"
+    },
+    {
+        "name": "Deny ingress from frontend to backend port 80",
+        "from": [
+            {
+                "key": "app.kubernetes.io/name",
+                "value": "frontend"
+            },
+            {
+                "key": "io.kubernetes.pod.namespace",
+                "value": "frontend",
+                "source": "k8s"
+            }
+        ],
+        "to": [
+            {
+                "key": "app.kubernetes.io/name",
+                "value": "backend"
+            },
+            {
+                "key": "io.kubernetes.pod.namespace",
+                "value": "backend",
+                "source": "k8s"
+            }
+        ],
+        "dPorts": [
+            {
+                "port": 80,
+                "protocol": "TCP"
+            }
+        ],
+        "direction": "ingress",
+        "expectedVerdict": "Denied"
+    },
+    {
+        "name": "Deny ingress from other namespaces to backend",
+        "from": [
+            {
+                "key": "app.kubernetes.io/name",
+                "value": "frontend"
+            },
+            {
+                "key": "io.kubernetes.pod.namespace",
+                "value": "default",
+                "source": "k8s"
+            }
+        ],
+        "to": [
+            {
+                "key": "app.kubernetes.io/name",
+                "value": "backend"
+            },
+            {
+                "key": "io.kubernetes.pod.namespace",
+                "value": "backend",
+                "source": "k8s"
+            }
+        ],
+        "dPorts": [
+            {
+                "port": 80,
+                "protocol": "TCP"
+            }
+        ],
+        "direction": "ingress",
+        "expectedVerdict": "Denied"
+    }
+]
