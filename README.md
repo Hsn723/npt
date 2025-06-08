@@ -7,7 +7,7 @@
 Download pre-compiled binaries in [Releases](https://github.com/Hsn723/npt/releases) or install manually:
 
 ```sh
-go install github.com/hsn723/npt@latest
+go install github.com/hsn723/npt/cmd/npt@latest
 ```
 
 ## Usage
