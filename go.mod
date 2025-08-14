@@ -6,7 +6,7 @@ require (
 	github.com/cilium/cilium v1.18.0
 	github.com/spf13/cobra v1.9.1
 	golang.org/x/sync v0.16.0
-	k8s.io/apimachinery v0.33.3
+	k8s.io/apimachinery v0.33.4
 )
 
 require (
@@ -23,7 +23,7 @@ require (
 	github.com/cloudflare/cfssl v1.6.5 // indirect
 	github.com/cncf/xds/go v0.0.0-20250501225837-2ac532fd4443 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
-	github.com/emicklei/go-restful/v3 v3.12.2 // indirect
+	github.com/emicklei/go-restful/v3 v3.13.0 // indirect
 	github.com/envoyproxy/go-control-plane/envoy v1.32.5-0.20250726235758-896bd55d3690 // indirect
 	github.com/envoyproxy/protoc-gen-validate v1.2.1 // indirect
 	github.com/fatih/color v1.18.0 // indirect
@@ -104,9 +104,9 @@ require (
 	gopkg.in/evanphx/json-patch.v4 v4.13.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	k8s.io/api v0.33.3 // indirect
-	k8s.io/apiextensions-apiserver v0.33.3 // indirect
-	k8s.io/client-go v0.33.3 // indirect
+	k8s.io/api v0.33.4 // indirect
+	k8s.io/apiextensions-apiserver v0.33.4 // indirect
+	k8s.io/client-go v0.33.4 // indirect
 	k8s.io/klog/v2 v2.130.1 // indirect
 	k8s.io/kube-openapi v0.0.0-20250318190949-c8a335a9a2ff // indirect
 	k8s.io/utils v0.0.0-20250604170112-4c0f3b243397 // indirect
