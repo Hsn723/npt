@@ -39,18 +39,18 @@ require (
 	github.com/go-openapi/runtime v0.28.0 // indirect
 	github.com/go-openapi/spec v0.21.0 // indirect
 	github.com/go-openapi/strfmt v0.23.0 // indirect
-	github.com/go-openapi/swag v0.24.1 // indirect
-	github.com/go-openapi/swag/cmdutils v0.24.0 // indirect
-	github.com/go-openapi/swag/conv v0.24.0 // indirect
-	github.com/go-openapi/swag/fileutils v0.24.0 // indirect
-	github.com/go-openapi/swag/jsonname v0.24.0 // indirect
-	github.com/go-openapi/swag/jsonutils v0.24.0 // indirect
-	github.com/go-openapi/swag/loading v0.24.0 // indirect
-	github.com/go-openapi/swag/mangling v0.24.0 // indirect
-	github.com/go-openapi/swag/netutils v0.24.0 // indirect
-	github.com/go-openapi/swag/stringutils v0.24.0 // indirect
-	github.com/go-openapi/swag/typeutils v0.24.0 // indirect
-	github.com/go-openapi/swag/yamlutils v0.24.0 // indirect
+	github.com/go-openapi/swag v0.25.0 // indirect
+	github.com/go-openapi/swag/cmdutils v0.25.0 // indirect
+	github.com/go-openapi/swag/conv v0.25.0 // indirect
+	github.com/go-openapi/swag/fileutils v0.25.0 // indirect
+	github.com/go-openapi/swag/jsonname v0.25.0 // indirect
+	github.com/go-openapi/swag/jsonutils v0.25.0 // indirect
+	github.com/go-openapi/swag/loading v0.25.0 // indirect
+	github.com/go-openapi/swag/mangling v0.25.0 // indirect
+	github.com/go-openapi/swag/netutils v0.25.0 // indirect
+	github.com/go-openapi/swag/stringutils v0.25.0 // indirect
+	github.com/go-openapi/swag/typeutils v0.25.0 // indirect
+	github.com/go-openapi/swag/yamlutils v0.25.0 // indirect
 	github.com/go-openapi/validate v0.24.0 // indirect
 	github.com/go-viper/mapstructure/v2 v2.4.0 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
@@ -60,11 +60,9 @@ require (
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/hashicorp/go-hclog v1.6.3 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
-	github.com/josharian/intern v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/liggitt/tabwriter v0.0.0-20181228230101-89fcab3d43de // indirect
 	github.com/mackerelio/go-osstat v0.2.6 // indirect
-	github.com/mailru/easyjson v0.9.1 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mitchellh/go-wordwrap v1.0.1 // indirect
