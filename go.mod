@@ -3,7 +3,7 @@ module github.com/hsn723/npt
 go 1.24.0
 
 require (
-	github.com/cilium/cilium v1.18.2
+	github.com/cilium/cilium v1.18.3
 	github.com/spf13/cobra v1.10.1
 	golang.org/x/sync v0.17.0
 	k8s.io/apimachinery v0.34.1
@@ -78,7 +78,7 @@ require (
 	github.com/prometheus/client_golang v1.23.2 // indirect
 	github.com/prometheus/client_model v0.6.2 // indirect
 	github.com/prometheus/common v0.67.1 // indirect
-	github.com/prometheus/procfs v0.17.0 // indirect
+	github.com/prometheus/procfs v0.18.0 // indirect
 	github.com/sagikazarmark/locafero v0.12.0 // indirect
 	github.com/sasha-s/go-deadlock v0.3.6 // indirect
 	github.com/spf13/afero v1.15.0 // indirect
