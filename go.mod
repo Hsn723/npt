@@ -3,10 +3,10 @@ module github.com/hsn723/npt
 go 1.24.0
 
 require (
-	github.com/cilium/cilium v1.18.3
+	github.com/cilium/cilium v1.18.4
 	github.com/spf13/cobra v1.10.1
 	golang.org/x/sync v0.18.0
-	k8s.io/apimachinery v0.34.1
+	k8s.io/apimachinery v0.34.2
 )
 
 require (
@@ -17,7 +17,7 @@ require (
 	github.com/cilium/ebpf v0.20.0 // indirect
 	github.com/cilium/hive v0.0.0-20250731144630-28e7a35ed227 // indirect
 	github.com/cilium/proxy v0.0.0-20250623105955-2136f59a4ea1 // indirect
-	github.com/cilium/statedb v0.5.2 // indirect
+	github.com/cilium/statedb v0.5.3 // indirect
 	github.com/cilium/stream v0.0.1 // indirect
 	github.com/cloudflare/cfssl v1.6.5 // indirect
 	github.com/cncf/xds/go v0.0.0-20250501225837-2ac532fd4443 // indirect
@@ -57,6 +57,7 @@ require (
 	github.com/google/gnostic-models v0.7.0 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.27.1 // indirect
 	github.com/hashicorp/go-hclog v1.6.3 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
@@ -92,6 +93,7 @@ require (
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
 	go.opentelemetry.io/otel v1.38.0 // indirect
 	go.opentelemetry.io/otel/metric v1.38.0 // indirect
+	go.opentelemetry.io/otel/sdk/metric v1.38.0 // indirect
 	go.opentelemetry.io/otel/trace v1.38.0 // indirect
 	go.uber.org/dig v1.19.0 // indirect
 	go.yaml.in/yaml/v2 v2.4.3 // indirect
@@ -110,9 +112,9 @@ require (
 	google.golang.org/protobuf v1.36.10 // indirect
 	gopkg.in/evanphx/json-patch.v4 v4.13.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
-	k8s.io/api v0.34.1 // indirect
-	k8s.io/apiextensions-apiserver v0.34.1 // indirect
-	k8s.io/client-go v0.34.1 // indirect
+	k8s.io/api v0.34.2 // indirect
+	k8s.io/apiextensions-apiserver v0.34.2 // indirect
+	k8s.io/client-go v0.34.2 // indirect
 	k8s.io/klog/v2 v2.130.1 // indirect
 	k8s.io/kube-openapi v0.0.0-20250710124328-f3f2b991d03b // indirect
 	k8s.io/utils v0.0.0-20250604170112-4c0f3b243397 // indirect
