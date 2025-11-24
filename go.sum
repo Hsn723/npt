@@ -16,8 +16,8 @@ github.com/cilium/hive v0.0.0-20250731144630-28e7a35ed227 h1:eeiPlekde25dlwsqv87
 github.com/cilium/hive v0.0.0-20250731144630-28e7a35ed227/go.mod h1:6qtm9+eQD8D1SsqGFgNE63lNeys9PZswouh37X5ZhWU=
 github.com/cilium/proxy v0.0.0-20250623105955-2136f59a4ea1 h1:SOOtIfQmW/pF1iW1I4hVUx1pvgX7Xh2E8jHv+itBXQ0=
 github.com/cilium/proxy v0.0.0-20250623105955-2136f59a4ea1/go.mod h1:Kwyyx+cC2H67Aj1sDuqBLvPn6TEmEJRPvULIrJ/kBRo=
-github.com/cilium/statedb v0.5.4 h1:12wSQCsY91clLIGBGnJRZgFCA6JIozrTK89p28vxSw4=
-github.com/cilium/statedb v0.5.4/go.mod h1:utZbqAU8l3X/2zmbBwoYC2KuRTstuSqo+c4cw4jXsCM=
+github.com/cilium/statedb v0.5.5 h1:h/kb9Pw61v4sj9xBdnoUeDvWTthzgEaM+psoBq+eqT4=
+github.com/cilium/statedb v0.5.5/go.mod h1:utZbqAU8l3X/2zmbBwoYC2KuRTstuSqo+c4cw4jXsCM=
 github.com/cilium/stream v0.0.1 h1:82zuM/WwkLiac2Jg5FrzPxZHvIBbxXTi4VY7M+EYLs0=
 github.com/cilium/stream v0.0.1/go.mod h1:/e83AwqvNKpyg4n3C41qmnmj1x2G9DwzI+jb7GkF4lI=
 github.com/cloudflare/cfssl v1.6.5 h1:46zpNkm6dlNkMZH/wMW22ejih6gIaJbzL2du6vD7ZeI=
