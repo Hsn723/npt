@@ -17,7 +17,7 @@ require (
 	github.com/cilium/ebpf v0.20.0 // indirect
 	github.com/cilium/hive v0.0.0-20250731144630-28e7a35ed227 // indirect
 	github.com/cilium/proxy v0.0.0-20250623105955-2136f59a4ea1 // indirect
-	github.com/cilium/statedb v0.5.5 // indirect
+	github.com/cilium/statedb v0.5.6 // indirect
 	github.com/cilium/stream v0.0.1 // indirect
 	github.com/cloudflare/cfssl v1.6.5 // indirect
 	github.com/cncf/xds/go v0.0.0-20251022180443-0feb69152e9f // indirect
