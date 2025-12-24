@@ -1,6 +1,6 @@
 PROJECT = npt
 VERSION = $(shell cat VERSION)
-LDFLAGS=-ldflags "-w -s -X github.com/hsn723/$(PROJECT)/cmd.version=${VERSION}"
+LDFLAGS=-ldflags "-w -s -X main.version=${VERSION}"
 
 BINDIR = $(shell pwd)/bin
 

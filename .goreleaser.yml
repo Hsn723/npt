@@ -15,10 +15,10 @@ builds:
     ldflags:
       - -s
       - -w
-      - -X github.com/hsn723/npt/cmd.version={{.Version}}
-      - -X github.com/hsn723/npt/cmd.commit={{.Commit}}
-      - -X github.com/hsn723/npt/cmd.date={{.Date}}
-      - -X github.com/hsn723/npt/cmd.builtBy=goreleaser
+      - -X main.version={{.Version}}
+      - -X main.commit={{.Commit}}
+      - -X main.date={{.Date}}
+      - -X main.builtBy=goreleaser
 checksum:
   name_template: 'checksums.txt'
 snapshot:
