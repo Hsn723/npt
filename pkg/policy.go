@@ -3,6 +3,7 @@ package pkg
 import (
 	"io"
 	"io/fs"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"strings"
@@ -14,7 +15,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/yaml"
 )
 
-func loadPoliciesFromFile(file string) (api.Rules, error) {
+func loadPoliciesFromFile(logger *slog.Logger, file string) (api.Rules, error) {
 	f, err := os.Open(file)
 	if err != nil {
 		return nil, err
@@ -42,7 +43,7 @@ func loadPoliciesFromFile(file string) (api.Rules, error) {
 			if err := yaml.Unmarshal(jsonData, &cnp); err != nil {
 				return nil, err
 			}
-			rules, err := cnp.Parse()
+			rules, err := cnp.Parse(logger, "")
 			if err != nil {
 				return nil, err
 			}
@@ -52,7 +53,7 @@ func loadPoliciesFromFile(file string) (api.Rules, error) {
 			if err := yaml.Unmarshal(jsonData, &ccnp); err != nil {
 				return nil, err
 			}
-			rules, err := ccnp.Parse()
+			rules, err := ccnp.Parse(logger, "")
 			if err != nil {
 				return nil, err
 			}
@@ -65,7 +66,7 @@ func loadPoliciesFromFile(file string) (api.Rules, error) {
 }
 
 // LoadPolicies loads Cilium Network Policies from the specified directories and files.
-func LoadPolicies(policyDirs, policyFiles []string) (api.Rules, error) {
+func LoadPolicies(logger *slog.Logger, policyDirs, policyFiles []string) (api.Rules, error) {
 	var allRules api.Rules
 	loader := func (path string, d fs.DirEntry, err error) error {
 		if err != nil || d.IsDir() || !strings.HasSuffix(d.Name(), ".yaml") {
@@ -82,7 +83,7 @@ func LoadPolicies(policyDirs, policyFiles []string) (api.Rules, error) {
 	for i, file := range policyFiles {
 		file := file
 		errGroup.Go(func() error {
-			rules, err := loadPoliciesFromFile(file)
+			rules, err := loadPoliciesFromFile(logger, file)
 			if err != nil {
 				return err
 			}
