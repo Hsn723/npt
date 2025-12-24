@@ -23,12 +23,10 @@
                 "source": "k8s"
             }
         ],
-        "dPorts": [
-            {
-                "port": 443,
-                "protocol": "TCP"
-            }
-        ],
+        "dPort": {
+            "port": 443,
+            "protocol": "TCP"
+        },
         "direction": "ingress",
         "expectedVerdict": "Allowed"
     },
@@ -56,12 +54,10 @@
                 "source": "k8s"
             }
         ],
-        "dPorts": [
-            {
-                "port": 80,
-                "protocol": "TCP"
-            }
-        ],
+        "dPort": {
+            "port": 80,
+            "protocol": "TCP"
+        },
         "direction": "ingress",
         "expectedVerdict": "Denied"
     },
@@ -89,12 +85,10 @@
                 "source": "k8s"
             }
         ],
-        "dPorts": [
-            {
-                "port": 80,
-                "protocol": "TCP"
-            }
-        ],
+        "dPort": {
+            "port": 80,
+            "protocol": "TCP"
+        },
         "direction": "ingress",
         "expectedVerdict": "Denied"
     }

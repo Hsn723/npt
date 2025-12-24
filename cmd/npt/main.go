@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"os"
 
+	"github.com/cilium/cilium/pkg/identity/identitymanager"
 	"github.com/hsn723/npt/pkg"
 	"github.com/spf13/cobra"
 )
@@ -27,8 +28,14 @@ var (
 )
 
 func runRoot(cmd *cobra.Command, args []string) error {
-	repo := pkg.InitializeRepo()
-	rules, err := pkg.LoadPolicies(policyDirs, policyFiles)
+	if isVerbose {
+		slog.SetLogLoggerLevel(slog.LevelDebug)
+	}
+	logger := slog.Default()
+	identityManager := identitymanager.NewIDManager(logger)
+
+	repo := pkg.InitializeRepo(logger, identityManager)
+	rules, err := pkg.LoadPolicies(logger, policyDirs, policyFiles)
 	if err != nil {
 		return err
 	}
@@ -39,7 +46,7 @@ func runRoot(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	results := pkg.RunScenarios(repo, scenarios, isVerbose)
+	results := pkg.RunScenarios(logger, repo, identityManager, scenarios, isVerbose)
 	var w *os.File
 	if outFile != "" {
 		w, err = os.Create(outFile)

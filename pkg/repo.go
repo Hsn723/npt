@@ -2,19 +2,23 @@ package pkg
 
 import (
 	"context"
+	"log/slog"
 
+	"github.com/cilium/cilium/pkg/crypto/certificatemanager"
 	"github.com/cilium/cilium/pkg/identity"
 	"github.com/cilium/cilium/pkg/identity/identitymanager"
+	envoypolicy "github.com/cilium/cilium/pkg/envoy/policy"
 	"github.com/cilium/cilium/pkg/policy"
 	"github.com/cilium/cilium/pkg/policy/api"
 )
 
-func InitializeRepo() *policy.Repository {
+func InitializeRepo(logger *slog.Logger, idm identitymanager.IDManager) *policy.Repository {
 	return policy.NewPolicyRepository(
-		identity.IdentityMap{},
+		logger,
+		identity.ListReservedIdentities(),
 		mockCertificateManager{},
-		mockSecretManager{},
-		identitymanager.NewIDManager(),
+		envoypolicy.NewEnvoyL7RulesTranslator(logger, certificatemanager.NewMockSecretManagerInline()),
+		idm,
 		mockPolicyMetrics{},
 	)
 }
@@ -23,24 +27,6 @@ type mockCertificateManager struct {}
 
 func (m mockCertificateManager) GetTLSContext(_ context.Context, _ *api.TLSContext, _ string) (string, string, string, bool, error) {
 	return "", "", "", false, nil
-}
-
-type mockSecretManager struct {}
-
-func (m mockSecretManager) GetSecretString(_ context.Context, _ *api.Secret, _ string) (string, error) {
-	return "", nil
-}
-
-func (m mockSecretManager) PolicySecretSyncEnabled() bool {
-	return false
-}
-
-func (m mockSecretManager) SecretsOnlyFromSecretsNamespace() bool {
-	return false
-}
-
-func (m mockSecretManager) GetSecretSyncNamespace() string {
-	return ""
 }
 
 type mockPolicyMetrics struct {}

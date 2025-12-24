@@ -1,10 +1,11 @@
 package pkg
 
 import (
+	"context"
 	"encoding/json"
 	"io"
 	"io/fs"
-	"log"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"slices"
@@ -12,9 +13,14 @@ import (
 	"sync"
 
 	"github.com/cilium/cilium/api/v1/models"
+	"github.com/cilium/cilium/pkg/identity"
+	"github.com/cilium/cilium/pkg/identity/cache"
+	"github.com/cilium/cilium/pkg/identity/identitymanager"
 	"github.com/cilium/cilium/pkg/labels"
 	"github.com/cilium/cilium/pkg/policy"
 	"github.com/cilium/cilium/pkg/policy/api"
+	"github.com/cilium/cilium/pkg/u8proto"
+	"github.com/cilium/statedb"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -22,22 +28,53 @@ type Scenario struct {
 	Name            string         `json:"name"`
 	From            []labels.Label `json:"from"`
 	To              []labels.Label `json:"to"`
-	DPorts          []*models.Port `json:"dPorts"`
+	DPort           *models.Port   `json:"dPort"`
 	Direction       Direction      `json:"direction"`
 	ExpectedVerdict Verdict        `json:"expectedVerdict"`
 }
 
-func (s Scenario) ToSearchContext(verbose bool) *policy.SearchContext {
-	sc := &policy.SearchContext{
-		From:   s.From,
-		To:     s.To,
-		DPorts: s.DPorts,
+func (s Scenario) ToFlow(allocator *cache.CachingIdentityAllocator) *policy.Flow {
+	ctx := context.Background()
+	protocol, err := u8proto.ParseProtocol(s.DPort.Protocol)
+	if err != nil {
+		return nil
 	}
-	if verbose {
-		sc.Logging = log.New(os.Stderr, "", 0)
-		sc.Trace = policy.TRACE_VERBOSE
+	fromIdentity, isAlloc, err := allocator.AllocateIdentity(ctx, labels.FromSlice(s.From), false, identity.InvalidIdentity)
+	if err != nil || !isAlloc {
+		return nil
 	}
-	return sc
+	toIdentity, isAlloc, err := allocator.AllocateIdentity(ctx, labels.FromSlice(s.To), false, identity.InvalidIdentity)
+	if err != nil || !isAlloc {
+		return nil
+	}
+	flow := &policy.Flow{
+		From:  fromIdentity,
+		To:    toIdentity,
+		Proto: protocol,
+		Dport: s.DPort.Port,
+	}
+	return flow
+}
+
+func (s Scenario) ToEndpointInfo(logger *slog.Logger, flow *policy.Flow) (src, dest *policy.EndpointInfo) {
+	src = &policy.EndpointInfo{
+		ID: uint64(flow.From.ID),
+		Logger: logger,
+	}
+	dest = &policy.EndpointInfo{
+		ID: uint64(flow.To.ID),
+		Logger: logger,
+	}
+	namedPort := map[string]uint16{
+		s.DPort.Name: s.DPort.Port,
+	}
+	switch s.DPort.Protocol {
+	case "TCP":
+		src.TCPNamedPorts = namedPort
+	case "UDP":
+		src.UDPNamedPorts = namedPort
+	}
+	return src, dest
 }
 
 type Direction string
@@ -50,14 +87,14 @@ const (
 type Verdict string
 
 const (
-	VercictAllow     Verdict = "Allowed"
+	VerdictAllow     Verdict = "Allowed"
 	VerdictDeny      Verdict = "Denied"
 	VerdictUndecided Verdict = "Undecided"
 )
 
 func (v Verdict) Decision() api.Decision {
 	switch v {
-	case VercictAllow:
+	case VerdictAllow:
 		return api.Allowed
 	case VerdictDeny:
 		return api.Denied
@@ -73,7 +110,7 @@ func (v Verdict) String() string {
 func ParseDecision(d api.Decision) Verdict {
 	switch d {
 	case api.Allowed:
-		return VercictAllow
+		return VerdictAllow
 	case api.Denied:
 		return VerdictDeny
 	default:
@@ -133,20 +170,41 @@ func LoadScenarios(scenarioDirs, scenarioFiles []string) ([]Scenario, error) {
 	return allScenarios, nil
 }
 
-func RunScenarios(repo *policy.Repository, scenarios []Scenario, isVerbose bool) []ScenarioResult {
+func updateSelectorCache(repo *policy.Repository, allocator *cache.CachingIdentityAllocator) {
+	wg := sync.WaitGroup{}
+	selectorCache := repo.GetSelectorCache()
+	added := allocator.GetIdentityCache()
+	selectorCache.UpdateIdentities(added, nil, &wg)
+	wg.Wait()
+}
+
+func RunScenarios(logger *slog.Logger, repo *policy.Repository, idm identitymanager.IDManager, scenarios []Scenario, isVerbose bool) []ScenarioResult {
 	results := make([]ScenarioResult, 0, len(scenarios))
 	resultsChannel := make(chan ScenarioResult, len(scenarios))
 	wg := sync.WaitGroup{}
 	wg.Add(len(scenarios))
 	for _, scenario := range scenarios {
 		go func(scenario Scenario) {
-			searchContext := scenario.ToSearchContext(isVerbose)
-			var decision api.Decision
-			switch scenario.Direction {
-			case DirectionIngress:
-				decision = repo.AllowsIngressRLocked(searchContext)
-			case DirectionEgress:
-				decision = repo.AllowsEgressRLocked(searchContext)
+			defer wg.Done()
+			db := statedb.New()
+			db.Start()
+			defer db.Stop()
+			allocatorLogger := logger
+			if !isVerbose {
+				allocatorLogger = slog.New(slog.NewTextHandler(io.Discard, &slog.HandlerOptions{Level: slog.LevelError}))
+			}
+			allocator := getMockIdentityAllocator(allocatorLogger, db)
+			flow := scenario.ToFlow(allocator)
+			if flow == nil {
+				slog.Error("invalid flow", "scenario", scenario)
+				return
+			}
+			updateSelectorCache(repo, allocator)
+			srcEP, destEP := scenario.ToEndpointInfo(logger, flow)
+			decision, _, _, err := policy.LookupFlow(logger, repo, idm, *flow, srcEP, destEP)
+			if err != nil {
+				slog.Error("error looking up flow", "scenario", scenario, "error", err)
+				return
 			}
 			result := ScenarioResult{
 				Name:     scenario.Name,
@@ -154,7 +212,6 @@ func RunScenarios(repo *policy.Repository, scenarios []Scenario, isVerbose bool)
 				Actual:   ParseDecision(decision),
 			}
 			resultsChannel <- result
-			wg.Done()
 		}(scenario)
 	}
 	wg.Wait()
