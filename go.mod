@@ -4,11 +4,13 @@ go 1.25.0
 
 require (
 	github.com/cilium/cilium v1.18.5
-	github.com/cilium/statedb v0.5.6
+	github.com/cilium/statedb v0.4.6
 	github.com/spf13/cobra v1.10.2
 	golang.org/x/sync v0.19.0
 	k8s.io/apimachinery v0.35.0
 )
+
+replace github.com/cilium/statedb => github.com/cilium/statedb v0.4.6
 
 require (
 	cel.dev/expr v0.25.1 // indirect
