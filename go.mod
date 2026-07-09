@@ -3,7 +3,7 @@ module github.com/hsn723/npt
 go 1.25.0
 
 require (
-	github.com/cilium/cilium v1.18.9
+	github.com/cilium/cilium v1.18.10
 	github.com/cilium/statedb v0.4.6
 	github.com/spf13/cobra v1.10.2
 	golang.org/x/sync v0.20.0
